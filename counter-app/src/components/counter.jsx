@@ -17,8 +17,8 @@ class Counter extends Component {
     );
   }
   //arrow functions works as binding function for this keyword
-  handleIncrement = () => {
-    console.log("Increment clicked!!", this.state.count);
+  handleIncrement = (product) => {
+    console.log('Product',product);
     this.setState({count:this.state.count+1})
   };
 
@@ -28,7 +28,7 @@ class Counter extends Component {
         <span className={this.getBadgeClasses()}>{this.formatCount()}</span>
         <button
           className="btn btn-secondary btn-sm"
-          onClick={this.handleIncrement}
+          onClick={()=>this.handleIncrement({id:1})}
         >
           Increment
         </button>
