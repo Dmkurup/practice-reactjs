@@ -1,12 +1,14 @@
 import React, { Component } from "react";
-import { getMovies } from "../services/fakeMovieService";
+import { getMovies } from "../services/movieService";
 import _ from "lodash";
+import { Link } from "react-router-dom";
 
 import Pagination from "./common/pagination";
 import { paginate } from "./utils/paginate";
-import { getGenres } from "../services/fakeGenreService";
+import { getGenres } from "../services/genreService";
 import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
+import { deleteMovie } from "../services/movieService";
 
 class Movies extends Component {
   state = {
@@ -21,14 +23,27 @@ class Movies extends Component {
     // selectedGenre: genres[0]
   };
 
-  componentDidMount() {
-    const genres = [{ _id: " ", name: "All Genres" }, ...getGenres()];
-    this.setState({ movies: getMovies(), genres });
+  async componentDidMount() {
+    const { data } = await getGenres();
+    const genres = [{ _id: "", name: "All Genres" }, ...data];
+
+    const { data: movies } = await getMovies();
+    this.setState({ movies, genres });
   }
 
-  handleDelete = (movie) => {
-    const movies = this.state.movies.filter((m) => m._id !== movie._id);
+  handleDelete = async (movie) => {
+    const originalMovies = this.state.movies;
+    const movies = originalMovies.filter((m) => m._id !== movie._id);
     this.setState({ movies });
+
+    try {
+      await deleteMovie(movie._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        alert("Movie already deleted!!");
+
+      this.setState({ movies: originalMovies });
+    }
   };
 
   handleLike = (movie) => {
@@ -61,6 +76,8 @@ class Movies extends Component {
       sortColumn,
       selectedGenre,
     } = this.state;
+
+  
     const filtered =
       selectedGenre && selectedGenre._id
         ? allMovies.filter((m) => m.genre._id === selectedGenre._id)
@@ -90,6 +107,10 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
+          <Link to="/movies/new" className="btn btn-primary">
+            New Movie
+          </Link>
+
           <p>Showing {totalCount} movies from the data base</p>
           <MoviesTable
             movies={movies}
