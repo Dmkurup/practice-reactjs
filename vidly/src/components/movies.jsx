@@ -91,6 +91,7 @@ class Movies extends Component {
   };
 
   render() {
+    const {user}=this.props;
     const { length: moviesCount } = this.state.movies;
     const { pageSize, currentPage, sortColumn, genres } = this.state;
     if (moviesCount === 0) return <p>There are no movies in the database</p>;
@@ -100,16 +101,16 @@ class Movies extends Component {
     return (
       <div className="row">
         <div className="col-3">
-          <ListGroup
+        <ListGroup
             items={genres}
             onItemSelect={this.handleGenreSelect}
             selectedItem={this.state.selectedGenre}
           />
         </div>
         <div className="col">
-          <Link to="/movies/new" className="btn btn-primary">
+        {  user &&<Link to="/movies/new" className="btn btn-primary">
             New Movie
-          </Link>
+          </Link>}
 
           <p>Showing {totalCount} movies from the data base</p>
           <MoviesTable

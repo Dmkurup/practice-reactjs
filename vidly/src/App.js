@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
 import Movies from "./components/movies";
+import ProtectedRoute from "./components/protectedRoute";
 import MovieForm from "./components/movieForm";
 import LoginForm from "./components/loginForm";
 import LogOut from "./components/logout";
@@ -12,6 +13,7 @@ import NavBar from "./components/navBar";
 import auth from "./services/authService";
 
 import "./App.css";
+
 class App extends Component {
   state = {};
   componentDidMount() {
@@ -21,16 +23,26 @@ class App extends Component {
   }
 
   render() {
+    const { user } = this.state;
     return (
       <React.Fragment>
-        <NavBar user={this.state.user} />
+        <NavBar user={user} />
         <main className="container">
           <Switch>
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={LogOut} />
-            <Route path="/movies/:id" component={MovieForm} />
-            <Route path="/movies" component={Movies} />
+            <ProtectedRoute path="/movies/:id" component={MovieForm} />
+            {/* <Route path="/movies/:id" 
+            render={props => {
+              if(!user) return <Redirect to="/login"/>;
+
+             return  <MovieForm {...props}/>;
+            }}/>*/}
+            <Route
+              path="/movies"
+              render={(props) => <Movies user={user} {...props} />}
+            /> 
             <Route path="/customers" component={Customers} />
             <Route path="/rentals" component={Rentals} />
             <Route path="/not-found" component={NotFound} />
